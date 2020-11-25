@@ -18,6 +18,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         // Set the view's delegate
         sceneView.delegate = self
+        sceneView.debugOptions = [ARSCNDebugOptions.showFeaturePoints]
         
         // Show statistics such as fps and timing information
         sceneView.showsStatistics = true
@@ -31,26 +32,9 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
 //        let madaraScene = SCNScene(named: "art.scnassets/madaraUchiha.scn")!
 //        if let madaraNode = madaraScene.rootNode.childNode(withName: "Sphere_for_copying_normals_to_madara_face_Sphere.001", recursively: true) {
-//            madaraNode.position = SCNVector3(0, -1, -0.5)
+//            madaraNode.position = SCNVevctor3(0, -1, -0.5)
 //            sceneView.scene.rootNode.addChildNode(madaraNode)
 //        }
-        
-        // Adding custom objects cube / sphere
-//        let cube = SCNBox(width: 0.2, height: 0.2, length: 0.2, chamferRadius: 0.01)
-//        let sphere = SCNSphere(radius: 0.2)
-//
-//        let material = SCNMaterial()
-//        material.diffuse.contents = UIImage(named: "art.scnassets/earth.jpg")
-//
-//        sphere.materials = [material]
-//
-//        let node = SCNNode()
-//
-//        node.position = SCNVector3(0.0, 0.1, -0.5)
-//
-//        node.geometry = sphere
-//
-//        sceneView.scene.rootNode.addChildNode(node)
         
         sceneView.autoenablesDefaultLighting = true
         
@@ -70,5 +54,31 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         // Pause the view's session
         sceneView.session.pause()
+    }
+    
+    func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
+        if anchor is ARPlaneAnchor {
+            let planeAnchor = anchor as! ARPlaneAnchor
+            
+            // Creating grid material for plane
+            let gridMaterial = SCNMaterial()
+            gridMaterial.diffuse.contents = UIImage(named: "art.scnassets/grid.png")
+            
+            // Creating plane and applying materials
+            let plane = SCNPlane(width: CGFloat(planeAnchor.extent.x), height: CGFloat(planeAnchor.extent.z))
+            plane.materials = [gridMaterial]
+            
+            // Creating plane node where plane will be positioned
+            let planeNode = SCNNode()
+            planeNode.position = SCNVector3(planeAnchor.center.x, 0, planeAnchor.center.z)
+            planeNode.transform = SCNMatrix4MakeRotation(-Float.pi / 2, 1, 0, 0)
+            
+            planeNode.geometry = plane
+
+            node.addChildNode(planeNode)
+            
+        } else {
+            return
+        }
     }
 }
